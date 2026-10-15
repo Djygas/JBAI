@@ -75,6 +75,14 @@ async def chat(req: ChatRequest) -> StreamingResponse:
             elif "404" in msg:
                 msg = (f"Модель {config.HF_MODEL} недоступна на router (404). "
                        "Проверьте название модели в .env (HF_MODEL).")
+            elif "402" in msg or "remaining credits" in msg or "credits" in msg.lower():
+                msg = ("На аккаунте Hugging Face закончились кредиты Inference Providers (402). "
+                       "Ключ рабочий, но за вызовы моделей нужно платить: пополните баланс на "
+                       "https://huggingface.co/settings/billing либо укажите в .env другой "
+                       "OpenAI-совместимый провайдер (HF_BASE_URL / HF_MODEL / HF_TOKEN).")
+            elif "429" in msg or "rate limit" in msg.lower():
+                msg = ("Провайдер модели ограничил частоту запросов (429). Подождите немного "
+                       "и повторите — либо проверьте лимиты аккаунта на huggingface.co/settings/billing.")
             yield frame({"error": msg})
 
     return StreamingResponse(
