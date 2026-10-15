@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Private AI Assistant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="title">Private AI Assistant</span>
+    </div>
+    <div class="meta">
+      <span id="status" class="status">готов</span>
+      <button id="clear" class="ghost" type="button" title="Очистить диалог">Очистить</button>
+    </div>
+  </header>
+
+  <main id="chat" class="chat" aria-live="polite">
+    <div class="msg assistant">
+      <div class="bubble">
+        Привет. Это твой приватный ассистент. Спроси что угодно — ответ придёт потоком.
+      </div>
+    </div>
+  </main>
+
+  <form id="form" class="composer" autocomplete="off">
+    <textarea id="input" rows="1" placeholder="Напиши сообщение… (Enter — отправить, Shift+Enter — новая строка)"
+              aria-label="Сообщение"></textarea>
+    <button id="send" type="submit" class="primary">Отправить</button>
+    <button id="stop" type="button" class="ghost" hidden>Стоп</button>
+  </form>
+
+  <script src="script.js"></script>
+</body>
+</html>

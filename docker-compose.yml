@@ -1,0 +1,57 @@
+version: "3.8"
+
+# Личный приватный ассистент: nginx (Basic Auth + статика) -> backend (FastAPI + HF router).
+# Проект на одного человека, поэтому учёта токенов и балансов здесь нет.
+services:
+  backend:
+    build: ./backend
+    container_name: private-ai-backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      HF_BASE_URL: ${HF_BASE_URL:-https://router.huggingface.co/v1}
+      HF_MODEL: ${HF_MODEL:-deepseek-ai/DeepSeek-V4-Pro}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-*}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    # порт наружу не публикуем: backend виден только внутри docker-сети, доступ — через nginx
+    expose:
+      - "8000"
+    networks:
+      - jbai
+
+  nginx:
+    build: ./nginx
+    container_name: private-ai-nginx
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+    networks:
+      - jbai
+
+  # PostgreSQL — на будущее (история, настройки). По умолчанию не поднимается:
+  # docker compose --profile db up -d
+  db:
+    image: postgres:16-alpine
+    container_name: private-ai-db
+    profiles: ["db"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-jbai}
+      POSTGRES_USER: ${POSTGRES_USER:-jbai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - jbai
+
+volumes:
+  dbdata:
+
+networks:
+  jbai:
+    driver: bridge
