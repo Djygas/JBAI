@@ -23,3 +23,9 @@ Thumbs.db
 data/
 logs/
 *.sqlite3
+
+# артефакты проверки тем (генерируются: python3 tests/themes_shot.py)
+screenshots/
+# резервная копия основного оформления при переключении тем
+.frontend_backup/
+.theme_backup_done

@@ -1,0 +1,176 @@
+/* JBAI — тема «Хакерская»: терминал, моно-шрифт, матрица, сканлайны.
+   Контракт с script.js: id chat/form/input/send/stop/clear/status, классы .msg/.bubble/.cursor, var --danger. */
+:root {
+  --bg: #05070a;
+  --panel: rgba(8, 14, 12, .82);
+  --line: #12351f;
+  --line-2: #1d5a34;
+  --text: #b8ffd0;
+  --text-2: #d8ffe8;
+  --muted: #4e8a68;
+  --accent: #00ff9c;
+  --accent-2: #00e5ff;
+  --user: #ffd166;
+  --danger: #ff4d4d;
+  --mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14.5px/1.6 var(--mono);
+  overflow: hidden;
+  text-shadow: 0 0 6px rgba(0, 255, 156, .25);
+}
+
+#matrix { position: fixed; inset: 0; opacity: .30; z-index: 0; }
+
+.scanlines {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .28) 2px 3px);
+  mix-blend-mode: multiply;
+}
+.vignette {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(0, 0, 0, .75) 100%);
+}
+
+.term {
+  position: relative; z-index: 3;
+  height: 100%; max-width: 1180px; margin: 0 auto;
+  display: flex; flex-direction: column;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(5, 12, 9, .92), rgba(5, 7, 10, .96));
+}
+
+/* ---------- шапка ---------- */
+.term-bar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(3, 10, 7, .9);
+}
+.win-dots { display: flex; gap: 6px; }
+.win-dots i { width: 10px; height: 10px; border-radius: 50%; background: #12351f; border: 1px solid var(--line-2); }
+.win-dots i:first-child { background: #2b0f12; border-color: #5c1c22; }
+
+.term-title { flex: 1; color: var(--muted); font-size: 12.5px; }
+.meta { display: flex; align-items: center; gap: 10px; }
+
+.status { color: var(--muted); font-size: 12.5px; }
+.status::before { content: "● "; color: var(--accent); }
+.status.busy { color: var(--accent); }
+.status.busy::before { animation: blip .7s steps(2) infinite; }
+.status.error { color: var(--danger); }
+.status.error::before { color: var(--danger); }
+@keyframes blip { 50% { opacity: .15; } }
+
+.tbtn {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--line-2);
+  padding: 5px 10px; cursor: pointer;
+  font: 13px/1 var(--mono);
+  transition: background .15s, color .15s, box-shadow .15s;
+}
+.tbtn:hover { background: rgba(0, 255, 156, .12); box-shadow: 0 0 12px rgba(0, 255, 156, .25); }
+.tbtn.primary { color: var(--accent); border-color: var(--accent); }
+.tbtn.primary:disabled { color: var(--muted); border-color: var(--line); cursor: default; box-shadow: none; }
+
+/* ---------- баннер ---------- */
+.banner {
+  display: flex; align-items: center; gap: 22px;
+  padding: 16px 20px 6px;
+  border-bottom: 1px solid rgba(18, 53, 31, .6);
+}
+.ascii {
+  margin: 0; font-size: 10px; line-height: 1.05;
+  color: var(--accent);
+  text-shadow: 0 0 14px rgba(0, 255, 156, .55);
+}
+.banner-info { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; }
+.blink-line::after {
+  content: "_"; color: var(--accent); animation: blip 1s steps(2) infinite;
+}
+.dim { color: var(--muted); }
+
+/* ---------- диалог ---------- */
+.chat {
+  flex: 1; overflow-y: auto;
+  padding: 18px 20px 8px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.chat::-webkit-scrollbar { width: 10px; }
+.chat::-webkit-scrollbar-track { background: #060d0a; }
+.chat::-webkit-scrollbar-thumb { background: var(--line-2); }
+
+.msg { display: flex; max-width: 100%; }
+.msg.user { justify-content: flex-end; }
+
+.bubble {
+  max-width: 88%;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  white-space: pre-wrap; word-wrap: break-word;
+  position: relative;
+}
+.msg.assistant .bubble { border-left: 2px solid var(--accent); }
+.msg.assistant .bubble::before {
+  content: "ai"; position: absolute; top: -9px; left: 10px;
+  background: var(--bg); padding: 0 5px; font-size: 10px; color: var(--accent);
+}
+.msg.user .bubble {
+  border-right: 2px solid var(--user); border-left: 1px solid var(--line);
+  color: #ffe6ad; box-shadow: inset 0 0 24px rgba(255, 209, 102, .06);
+}
+.msg.user .bubble::before {
+  content: "you"; position: absolute; top: -9px; right: 10px;
+  background: var(--bg); padding: 0 5px; font-size: 10px; color: var(--user);
+}
+
+.bubble code {
+  background: rgba(0, 229, 255, .10); color: var(--accent-2);
+  padding: 1px 5px; font-size: 13px;
+}
+.bubble pre {
+  margin: 10px 0 4px; padding: 12px 14px;
+  border: 1px solid var(--line); background: #04100b;
+  overflow-x: auto;
+}
+.bubble pre code { background: none; color: var(--accent); padding: 0; }
+
+.cursor::after {
+  content: "█"; color: var(--accent); animation: blip .9s steps(2) infinite;
+}
+
+/* ---------- ввод ---------- */
+.composer {
+  padding: 12px 20px 18px;
+  border-top: 1px solid var(--line);
+  background: rgba(3, 10, 7, .75);
+}
+.prompt-line { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); background: rgba(4, 14, 10, .7); }
+.prompt-line:focus-within { border-color: var(--accent); box-shadow: 0 0 16px rgba(0, 255, 156, .18); }
+.user-path { color: var(--accent); white-space: nowrap; }
+#input {
+  flex: 1; border: 0; outline: 0; resize: none; background: transparent;
+  color: var(--text-2); font: inherit; min-height: 24px; max-height: 180px;
+}
+#input::placeholder { color: #2f6b4c; }
+
+.composer-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.hint { margin-right: auto; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 780px) {
+  .banner { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .ascii { font-size: 8px; }
+  .chat { padding: 14px 12px 6px; }
+  .composer { padding: 10px 12px 14px; }
+  .hint { display: none; }
+  .term { border: 0; }
+}

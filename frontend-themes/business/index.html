@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JBAI — рабочий ассистент</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="layout">
+
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-mark">JB</span>
+        <div class="logo-text">
+          <strong>JBAI</strong>
+          <span>рабочий ассистент</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="nav-item active" href="#">
+          <span class="ico">◆</span> Диалог
+        </a>
+        <a class="nav-item" href="#">
+          <span class="ico">◇</span> История
+        </a>
+        <a class="nav-item" href="#">
+          <span class="ico">◇</span> Заметки
+        </a>
+        <a class="nav-item" href="#">
+          <span class="ico">◇</span> Настройки
+        </a>
+      </nav>
+
+      <div class="side-note">
+        <div class="side-note-title">Приватный контур</div>
+        <p>Запросы идут напрямую к модели. Данные не публикуются и не используются для обучения.</p>
+      </div>
+
+      <div class="side-foot">
+        <span class="badge-soft">v1.1</span>
+        <span>Доступ только у вас</span>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="crumbs">
+          <span class="crumb-root">Рабочее пространство</span>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-cur">Диалог с ассистентом</span>
+        </div>
+        <div class="meta">
+          <span id="status" class="status">готов</span>
+          <button id="clear" class="btn-ghost" type="button">Очистить</button>
+        </div>
+      </header>
+
+      <main id="chat" class="chat" aria-live="polite">
+        <div class="day">сегодня</div>
+        <div class="msg assistant">
+          <div class="avatar">AI</div>
+          <div class="bubble">
+            Добрый день. Я ваш рабочий ассистент: помогу с текстами, расчётами, разбором данных и
+            кодом для автоматизации. Опишите задачу — отвечу по шагам.
+          </div>
+        </div>
+      </main>
+
+      <form id="form" class="composer" autocomplete="off">
+        <div class="composer-box">
+          <textarea id="input" rows="1"
+            placeholder="Опишите задачу — например: «сравни два варианта подписки и посчитай окупаемость»"
+            aria-label="Сообщение"></textarea>
+          <div class="composer-actions">
+            <span class="hint">Enter — отправить · Shift+Enter — новая строка</span>
+            <button id="stop" type="button" class="btn-ghost" hidden>Остановить</button>
+            <button id="send" type="submit" class="btn-primary">Отправить</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

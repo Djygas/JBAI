@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JBAI — три варианта оформления</title>
+  <style>
+    :root { --bg: #0c0b12; --panel: #15141d; --line: #262336; --text: #e9e7f2; --muted: #8f8aa6; --accent: #6a2bff; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font: 15px/1.6 Inter, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      padding: 28px 32px 40px;
+    }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    .lead { margin: 0 0 26px; color: var(--muted); font-size: 13.5px; max-width: 90ch; }
+    .lead code { background: #1e1b2c; padding: 1px 6px; border-radius: 6px; color: #cbb6ff; }
+    .cols { display: flex; gap: 20px; flex-wrap: wrap; }
+    .col { width: 440px; }
+    .col h2 { margin: 0 0 4px; font-size: 16px; }
+    .col .desc { margin: 0 0 10px; color: var(--muted); font-size: 12.5px; min-height: 34px; }
+    .viewport {
+      width: 440px; height: 275px; overflow: hidden;
+      border: 1px solid var(--line); border-radius: 12px; background: #000;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+    }
+    .viewport iframe { width: 1440px; height: 900px; border: 0; transform: scale(0.30556); transform-origin: 0 0; }
+    .open { display: inline-block; margin-top: 9px; font-size: 12.5px; color: #b6a8ff; text-decoration: none; }
+    .open:hover { text-decoration: underline; }
+    .note {
+      margin-top: 26px; padding: 14px 16px; border: 1px solid var(--line);
+      border-radius: 12px; background: var(--panel); color: var(--muted); font-size: 13px; max-width: 100ch;
+    }
+    .note b { color: var(--text); }
+  </style>
+</head>
+<body>
+  <h1>JBAI — три варианта оформления</h1>
+  <p class="lead">
+    Одна и та же логика (поток ответа, история, стоп, очистка) и разные оболочки.
+    Переключение: <code>bash use_theme.sh business|hacker|jb</code> — скрипт копирует выбранную тему в
+    <code>frontend/</code>, после чего меняется только вид, код не трогается.
+  </p>
+
+  <div class="cols">
+    <section class="col">
+      <h2>1. Деловая</h2>
+      <p class="desc">Светлая, спокойная, «кабинетная»: сайдбар с разделами, синий акцент, аккуратные пузыри. Для бизнеса, клиентов и работы «в офисе».</p>
+      <div class="viewport"><iframe src="frontend-themes/business/index.html" loading="lazy" title="Тема «Деловая»"></iframe></div>
+      <a class="open" href="frontend-themes/business/index.html" target="_blank">открыть в полном размере →</a>
+    </section>
+
+    <section class="col">
+      <h2>2. Хакерская</h2>
+      <p class="desc">Терминал: моно-шрифт, матричный фон, сканлайны, ASCII-логотип, приглашение <code>root@jbai:~$</code>. Для своих и для «техно»-подачи.</p>
+      <div class="viewport"><iframe src="frontend-themes/hacker/index.html" loading="lazy" title="Тема «Хакерская»"></iframe></div>
+      <a class="open" href="frontend-themes/hacker/index.html" target="_blank">открыть в полном размере →</a>
+    </section>
+
+    <section class="col">
+      <h2>3. Фирменная JB</h2>
+      <p class="desc">Фиолетово-циановая палитра проектов (#6a2bff · #9d00ff · #00e5ff), стекло, свечение, блок проектов JBVPN / JBAI / автоматизация.</p>
+      <div class="viewport"><iframe src="frontend-themes/jb/index.html" loading="lazy" title="Тема «Фирменная JB»"></iframe></div>
+      <a class="open" href="frontend-themes/jb/index.html" target="_blank">открыть в полном размере →</a>
+    </section>
+  </div>
+
+  <p class="note">
+    <b>Важно:</b> это витрина внешнего вида. Чтобы чат реально отвечал, файлы должны отдаваться с того же домена,
+    где живёт backend (nginx проксирует <code>/api/</code> на backend). Если открыть файл напрямую с диска
+    (<code>file://</code>), кнопка «Отправить» упрётся в отсутствие API — это нормально, вид от этого не меняется.
+  </p>
+</body>
+</html>

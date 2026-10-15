@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JBAI — приватный ИИ-ассистент JB</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glow glow-a" aria-hidden="true"></div>
+  <div class="glow glow-b" aria-hidden="true"></div>
+
+  <div class="app">
+    <header class="hero">
+      <div class="hero-main">
+        <div class="mark">
+          <span class="mark-icon">JB</span>
+          <div class="mark-text">
+            <strong class="mark-title">JBAI</strong>
+            <span class="mark-sub">приватный ИИ-ассистент</span>
+          </div>
+        </div>
+        <p class="tagline">
+          Jeka Berzinsh · IT и автоматизация бизнеса.<br>
+          Личный ассистент для кода, текстов и разбора задач — без подписок и публичных сервисов.
+        </p>
+        <div class="chips">
+          <span class="chip">JBVPN</span>
+          <span class="chip">JBAI</span>
+          <span class="chip">Автоматизация</span>
+          <span class="chip">Боты и интеграции</span>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="status-card">
+          <span class="status-label">Состояние</span>
+          <span id="status" class="status">на связи</span>
+        </div>
+        <button id="clear" class="btn-soft" type="button">Новый диалог</button>
+      </div>
+    </header>
+
+    <div class="panel">
+      <main id="chat" class="chat" aria-live="polite">
+        <div class="msg assistant">
+          <div class="bubble">
+            Привет. Я JBAI — ассистент Джеки. Скину код, разберу схему, напишу текст или посчитаю
+            экономику проекта. С чего начнём?
+          </div>
+        </div>
+      </main>
+
+      <form id="form" class="composer" autocomplete="off">
+        <div class="composer-box">
+          <textarea id="input" rows="1"
+            placeholder="Напишите сообщение…"
+            aria-label="Сообщение"></textarea>
+          <div class="composer-actions">
+            <span class="hint">Enter — отправить</span>
+            <button id="stop" type="button" class="btn-soft" hidden>Стоп</button>
+            <button id="send" type="submit" class="btn-primary">Отправить</button>
+          </div>
+        </div>
+        <p class="foot-note">JBAI v1.1 · доступ защищён паролем · запросы идут напрямую к модели</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* в этой теме спокойное состояние называется «на связи» (см. LABELS в script.js) */
+    window.JBAI_LABELS = { ready: "на связи" };
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

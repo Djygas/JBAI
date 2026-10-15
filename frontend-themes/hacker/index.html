@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JBAI :: secure terminal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="matrix" aria-hidden="true"></canvas>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <div class="term">
+    <header class="term-bar">
+      <div class="win-dots"><i></i><i></i><i></i></div>
+      <span class="term-title">root@jbai: ~/chat — secure shell</span>
+      <span class="meta">
+        <span id="status" class="status">state: готов</span>
+        <button id="clear" class="tbtn" type="button">[clear]</button>
+      </span>
+    </header>
+
+    <div class="banner">
+      <pre class="ascii">      _  ____   _    ___
+     | |/ ___| / \  |_ _|
+  _  | | |    / _ \  | |
+ | |_| | |___/ ___ \ | |
+  \___/ \____/_/   \_\___|   v1.1</pre>
+      <div class="banner-info">
+        <span class="blink-line">&gt; приватный ассистент запущен</span>
+        <span class="dim">шифрованный канал · доступ по паролю · история только в памяти</span>
+      </div>
+    </div>
+
+    <main id="chat" class="chat" aria-live="polite">
+      <div class="msg assistant">
+        <div class="bubble">
+          <span class="dim">[ai]</span> сессия инициализирована. пиши задачу — отвечу потоком.
+        </div>
+      </div>
+    </main>
+
+    <form id="form" class="composer" autocomplete="off">
+      <div class="prompt-line">
+        <span class="user-path">root@jbai:~$</span>
+        <textarea id="input" rows="1" spellcheck="false"
+          placeholder="ввести команду… (Enter — отправить)" aria-label="Сообщение"></textarea>
+      </div>
+      <div class="composer-actions">
+        <span class="hint">[Enter] отправить · [Shift+Enter] новая строка</span>
+        <button id="stop" class="tbtn" type="button" hidden>[stop]</button>
+        <button id="send" class="tbtn primary" type="submit">[send]</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    /* терминальные подписи статуса (см. LABELS в script.js) */
+    window.JBAI_LABELS = {
+      busy: "state: генерация…",
+      ready: "state: готов",
+      stopped: "state: прервано",
+      error: "state: ошибка"
+    };
+  </script>
+  <script src="script.js"></script>
+  <script>
+    /* Матричный фон — только визуальный эффект, на работу чата не влияет. */
+    (() => {
+      const c = document.getElementById("matrix");
+      if (!c || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const ctx = c.getContext("2d");
+      const glyphs = "01ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ#$%&*+<>{}[]".split("");
+      let cols = [], w = 0, h = 0, size = 16;
+      function resize() {
+        w = c.width = window.innerWidth;
+        h = c.height = window.innerHeight;
+        cols = new Array(Math.floor(w / size)).fill(0).map(() => Math.random() * -50);
+      }
+      function draw() {
+        ctx.fillStyle = "rgba(5, 7, 10, .09)";
+        ctx.fillRect(0, 0, w, h);
+        ctx.font = size + "px monospace";
+        for (let i = 0; i < cols.length; i++) {
+          const ch = glyphs[(Math.random() * glyphs.length) | 0];
+          const y = cols[i] * size;
+          ctx.fillStyle = Math.random() > 0.96 ? "#00e5ff" : "rgba(0, 255, 156, .55)";
+          ctx.fillText(ch, i * size, y);
+          if (y > h && Math.random() > 0.975) cols[i] = 0;
+          cols[i] += 0.55;
+        }
+      }
+      resize();
+      window.addEventListener("resize", resize);
+      setInterval(draw, 55);
+    })();
+  </script>
+</body>
+</html>

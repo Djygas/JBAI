@@ -16,6 +16,13 @@
   let controller = null;
   let busy = false;
 
+  /* Подписи статуса. Тема может переопределить их в своём index.html:
+     <script>window.JBAI_LABELS = { busy: "state: генерация…", ready: "state: готов" };</script> */
+  const LABELS = Object.assign(
+    { busy: "печатает…", ready: "готов", stopped: "остановлено", error: "ошибка" },
+    window.JBAI_LABELS || {},
+  );
+
   const escapeHtml = (s) =>
     s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -43,8 +50,8 @@
 
   const scrollDown = () => { chatEl.scrollTop = chatEl.scrollHeight; };
 
-  function setStatus(text, kind = "") {
-    statusEl.textContent = text;
+  function setStatus(key, kind = "") {
+    statusEl.textContent = LABELS[key] || key;
     statusEl.className = "status" + (kind ? " " + kind : "");
   }
 
@@ -62,7 +69,7 @@
 
   async function send(text) {
     setBusy(true);
-    setStatus("печатает…", "busy");
+    setStatus("busy", "busy");
 
     history.push({ role: "user", content: text });
     addMessage("user", text);
@@ -121,14 +128,14 @@
 
       if (!answer) bubble.textContent = "(пустой ответ)";
       history.push({ role: "assistant", content: answer });
-      setStatus("готов");
+      setStatus("ready");
     } catch (err) {
       if (err.name === "AbortError") {
         if (answer) history.push({ role: "assistant", content: answer });
-        setStatus("остановлено");
+        setStatus("stopped");
       } else {
         bubble.innerHTML = `<span style="color:var(--danger)">Ошибка: ${escapeHtml(err.message)}</span>`;
-        setStatus("ошибка", "error");
+        setStatus("error", "error");
         history.pop();
       }
     } finally {
@@ -157,7 +164,7 @@
     history.length = 0;
     chatEl.innerHTML = "";
     addMessage("assistant", "История очищена. О чём поговорим?");
-    setStatus("готов");
+    setStatus("ready");
   });
 
   inputEl.addEventListener("input", autoGrow);
