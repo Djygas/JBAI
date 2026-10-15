@@ -30,8 +30,11 @@ private-ai-assistant/
 ├── tests/
 │   ├── stub_hf.py             # локальный «Hugging Face»: проверка стрима без ключа
 │   ├── smoke.sh               # автоматические проверки (health, auth, SSE)
-│   └── screens.py             # скриншоты интерфейса (playwright)
+│   ├── run_local.sh           # прогон автопроверок
+│   ├── serve_local.sh         # локальный стек без docker (стенд + backend + nginx)
+│   └── ui_check.py            # проверка интерфейса в браузере + скриншоты
 ├── docker-compose.yml
+├── setup.sh                   # первичная настройка на VPS
 ├── .env.example
 └── README.md
 ```
@@ -45,19 +48,20 @@ private-ai-assistant/
 git clone https://github.com/<ваш-аккаунт>/private-ai-assistant.git
 cd private-ai-assistant
 
-# 2. настройки и ключ
-cp .env.example .env
-nano .env          # впишите HF_TOKEN=hf_... (https://huggingface.co/settings/tokens)
+# 2. ключ и пароль + запуск — одной командой
+bash setup.sh          # сам создаст .env, попросит HF_TOKEN и логин/пароль, поднимет контейнеры
 
-# 3. пароль для входа в веб-интерфейс (Basic Auth)
+# открыть в браузере: http://<IP-сервера>   -> браузер спросит логин/пароль
+```
+
+Вручную (если не хотите скрипт):
+
+```bash
+cp .env.example .env && nano .env      # впишите HF_TOKEN=hf_...
 sudo apt install -y apache2-utils
-sudo htpasswd -c "$PWD/nginx/.htpasswd" ваш_логин     # один раз, затем без -c: sudo htpasswd "$PWD/nginx/.htpasswd" второй_логин
-
-# 4. поднять
+sudo htpasswd -c "$PWD/nginx/.htpasswd" ваш_логин    # затем без -c: sudo htpasswd "$PWD/nginx/.htpasswd" второй_логин
+sudo chmod 644 nginx/.htpasswd         # чтобы nginx в контейнере смог прочитать файл
 docker compose up -d --build
-
-# 5. открыть в браузере
-#    http://<IP-сервера>   -> браузер спросит логин/пароль из шага 3
 ```
 
 Логи и проверка:
@@ -93,10 +97,12 @@ curl -N -X POST http://127.0.0.1:8000/api/chat \
   -d '{"message":"привет"}'
 ```
 
-Проверка полного стека (nginx с Basic Auth) выполняется скриптом:
+Проверка полного стека (nginx с Basic Auth) одной командой — 16 автопроверок:
 
 ```bash
-bash tests/smoke.sh
+PYTHON=/путь/к/python bash tests/run_local.sh     # 401/200 Basic Auth, статика, прокси, SSE без буферизации
+python3 tests/serve_local.sh &                    # поднять локальный стек на :8090 (tester/secret123)
+python3 tests/ui_check.py                         # открыть UI в браузере и снять скриншоты
 ```
 
 ## Чеклист приёмки
@@ -122,7 +128,9 @@ git push -u origin main
 Проверить, что секретов нет в истории:
 
 ```bash
-git log --all --name-only | grep -E '\.env|htpasswd' || echo "секретов в истории нет"
+# в списке файлов не должно быть .env и nginx/.htpasswd (важен якорь $: .env.example — норма)
+git log --all --name-only --pretty=format: | sort -u | grep -x -E '\.env|nginx/\.htpasswd' \
+  && echo "ВНИМАНИЕ: секрет в истории!" || echo "PASS: секретов в истории нет"
 ```
 
 ## Полезно знать

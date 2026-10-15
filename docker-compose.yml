@@ -28,8 +28,20 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./frontend:/usr/share/nginx/html:ro
-      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+      - type: bind
+        source: ./frontend
+        target: /usr/share/nginx/html
+        read_only: true
+        bind:
+          create_host_path: false
+      # файл пароля создаётся вручную (htpasswd) и в git не хранится;
+      # create_host_path: false -> docker сразу скажет, что файла нет, вместо создания каталога
+      - type: bind
+        source: ./nginx/.htpasswd
+        target: /etc/nginx/.htpasswd
+        read_only: true
+        bind:
+          create_host_path: false
     networks:
       - jbai
 
